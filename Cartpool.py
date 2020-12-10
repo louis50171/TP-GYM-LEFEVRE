@@ -110,8 +110,8 @@ def cartpole_NN():
         score.append(s)
         print("Test Episode ", k + 1, " : ", s)
 
-    print("AVG : ", np.mean(score))
-    print("STD : ", np.std(score))
+    print("moyenne : ", np.mean(score))
+    print("Standard Deviation : ", np.std(score))
     env.close()
 
 
