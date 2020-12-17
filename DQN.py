@@ -15,7 +15,7 @@ class DQN:
         self.eval_model = Net(n_action).to(self.device)
         self.target_model = Net(n_action).to(self.device)
 
-        # Tentative pour charger les poids depuis la dernière sauvegarde
+        # charger les poids de la précédente sauvegarde
         try:
             self.eval_model.load_state_dict(torch.load("Save/" + config["SAVE_LOC"], map_location=self.device))
             self.target_model.load_state_dict(torch.load("Save/" + config["SAVE_LOC"], map_location=self.device))
