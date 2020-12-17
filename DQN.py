@@ -28,12 +28,8 @@ class DQN:
 
         self.memory = Buffer(self.param["BUFFER_SIZE"], state_shape, self.device)
 
-        # Optimisation selon le Double DQN ou pas
-        if self.config["DOUBLE_DQN"]:
-            self.optimizer = torch.optim.Adam(self.eval_model.parameters(),
-                                              lr=self.param["LR"], )
-        else:
-            self.optimizer = torch.optim.Adam(self.target_model.parameters(),
+
+        self.optimizer = torch.optim.Adam(self.target_model.parameters(),
                                               lr=self.param["LR"], )
 
         self.criterion = nn.MSELoss().to(self.device)
@@ -84,29 +80,15 @@ class DQN:
 
         state, action, next_state, reward, done = self.memory.get_batch(self.param["BATCH_SIZE"])
 
-        # Mode double DQN
-        if self.config["DOUBLE_DQN"]:
-            # Evolution lente des poids
-            eval_dict = self.eval_model.state_dict()
-            target_dict = self.eval_model.state_dict()
-            for weights in eval_dict:
-                target_dict[weights] = (1 - self.param['ALPHA']) * target_dict[weights] + self.param['ALPHA'] * eval_dict[
-                    weights]
-                self.target_model.load_state_dict(target_dict)
 
-            # Q valeurs d'évaluations
-            Q_eval = self.eval_model(state).gather(1, action.long().unsqueeze(1))
-
-        # Mode DQN Simple
-        else:
-            Q_eval = self.target_model(state).gather(1, action.long().unsqueeze(1))
+        Q_eval = self.target_model(state).gather(1, action.long().unsqueeze(1))
 
         # Calcul de la target
         Q_eval = Q_eval.reshape([self.param["BATCH_SIZE"]])
         Q_next = self.target_model(next_state).detach()
         Q_target = reward + self.param["GAMMA"] * Q_next.max(1)[0].reshape([self.param["BATCH_SIZE"]])  # "*reward
 
-        # Optimization
+        # Optimisation
         self.optimizer.zero_grad()
         loss = self.criterion(Q_eval, Q_target)
         loss.backward()
