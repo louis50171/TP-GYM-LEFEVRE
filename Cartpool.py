@@ -75,11 +75,7 @@ def cartpole_NN():
     observation_space = env.observation_space.shape[0]
     action_space = env.action_space.n
 
-    # Dueling
-    if config["DUELING_DQN"]:
-        net = Net_Dueling
-    else:
-        net = Net
+    net = Net
 
     # Création du DQN
     dqn = DQN(net, param, config, action_space, [observation_space])
