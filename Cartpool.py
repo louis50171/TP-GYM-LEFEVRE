@@ -75,13 +75,17 @@ def cartpole_NN():
     observation_space = env.observation_space.shape[0]
     action_space = env.action_space.n
 
-    net = Net
+    # Dueling ou pas
+    if config["DUELING_DQN"]:
+        net = Net_Dueling
+    else:
+        net = Net
 
     # Création du DQN
     dqn = DQN(net, param, config, action_space, [observation_space])
     scores_list = []
 
-    # entrainement sur le nombre d'épisodes
+    # Boucle d'entrainement sur le nombre d'épisodes
     if not config["TEST_MODE"]:
         for episode in range(param["N_EPISODE"]):
 
@@ -96,18 +100,18 @@ def cartpole_NN():
 
             if config["PLOTTING"]: plot_evolution(scores_list)  # Affichage reward temps réel
 
-        # Save du DQN
+        # Sauvegarde du DQN
         if config["SAVE"] : torch.save(dqn.eval_model.state_dict(), "Save/" + config["SAVE_LOC"])
 
-    # test
+    # Boucle de test
     score = []
     for k in range(config["N_TEST"]):
         s = test(env, dqn)
         score.append(s)
         print("Test Episode ", k + 1, " : ", s)
 
-    print("moyenne : ", np.mean(score))
-    print("Standard Deviation : ", np.std(score))
+    print("AVG : ", np.mean(score))
+    print("STD : ", np.std(score))
     env.close()
 
 
