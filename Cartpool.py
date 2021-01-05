@@ -1,6 +1,6 @@
 import gym
 import matplotlib.pyplot as plt
-from DeepNet import Net, Net_Dueling
+from DeepNet import Net
 import torch
 import numpy as np
 from DQN import DQN
@@ -8,8 +8,7 @@ from DQN import DQN
 torch.manual_seed(0)
 
 config = {
-    "TEST_MODE": True,      # Désactive l'entrainement et teste directement le réseau sauvegardé
-    "DUELING_DQN": False,   # Active le dueling DQN
+    "TEST_MODE": False,      # Désactive l'entrainement et teste directement le réseau sauvegardé
     "DOUBLE_DQN": True,     # Active le double DQN
     "BOLTZMANN": False,     # Exploration boltzmann (True), epsilon-greedy (False)
     "PLOTTING": True,       # Affichage du reward temps réel (lent)
@@ -75,11 +74,8 @@ def cartpole_NN():
     observation_space = env.observation_space.shape[0]
     action_space = env.action_space.n
 
-    # Dueling ou pas
-    if config["DUELING_DQN"]:
-        net = Net_Dueling
-    else:
-        net = Net
+
+    net = Net
 
     # Création du DQN
     dqn = DQN(net, param, config, action_space, [observation_space])
